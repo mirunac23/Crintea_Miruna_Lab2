@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
 namespace Crintea_Miruna_Lab2.Models
@@ -9,7 +10,13 @@ namespace Crintea_Miruna_Lab2.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public ICollection<Book>? Books { get; set; }
-        [NotMapped]
-        public string FullName => string.Format("{0} {1}", FirstName, LastName);
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return FirstName + " " + LastName;
+            }
+        }
     }
 }

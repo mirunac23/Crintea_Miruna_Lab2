@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Crintea_Miruna_Lab2.Data;
 using Crintea_Miruna_Lab2.Models;
+using Crintea_Miruna_Lab2.Models.ViewModels;
 
 namespace Crintea_Miruna_Lab2.Pages.Categories
 {
@@ -19,13 +20,26 @@ namespace Crintea_Miruna_Lab2.Pages.Categories
             _context = context;
         }
 
-        public IList<Category> Category { get;set; } = default!;
+        public IList<Category> Category { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public BookCategoryIndexData BookCategoryData { get; set; }
+        public int CategoryID { get; set; }
+        public int BookID { get; set; }
+        public async Task OnGetAsync(int? id, int? bookID)
         {
-            if (_context.Category != null)
+            BookCategoryData = new BookCategoryIndexData();
+            BookCategoryData.Categories = await _context.Category
+            .Include(i => i.BookCategories)
+            .ThenInclude(i => i.Book)
+            .ThenInclude(c => c.Author)
+            .OrderBy(i => i.CategoryName)
+            .ToListAsync();
+            if (id != null)
             {
-                Category = await _context.Category.ToListAsync();
+                CategoryID = id.Value;
+                Category category = BookCategoryData.Categories
+                .Where(i => i.ID == id.Value).Single();
+                BookCategoryData.Books = category.BookCategories.Select(i => i.Book);
             }
         }
     }
